@@ -1,3 +1,1 @@
-# first-bot
-
-my bot
+# my first bot
