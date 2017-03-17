@@ -3,31 +3,23 @@ from os.path import exists
 import csv
 from datetime import datetime, timedelta
 from dateutil import parser as dateparser
-
 from datefoo import *
 
-
-
-
-
 def make_seattle_data_url(startdate, enddate):
-    # https://dev.socrata.com/docs/queries/where.html
-    # https://dev.socrata.com/docs/queries/query.html
-    return "http://theurlcall."
+    base_url = 'https://soda.demo.socrata.com/resource/kzjm-xkqj/rows.csv?$where='
+    url_string = 'Datetime >={start}&Datetime <={end}'.format(start=startdate,end=enddate)
+    url = base_url + url_string + '0000' #for some reason the timezone tag isn't working so manually adding timezone
 
+    return url
 
-
-######## delete this later
-DATA_URL = 'https://data.seattle.gov/api/views/kzjm-xkqj/rows.csv?accessType=DOWNLOAD'
-DATA_FILENAME = 'data/seattle911.csv'
-def save_data(txt):
-    with open(DATA_FILENAME, 'w') as f:
-        f.write(txt)
-###########
-
-# change to get_data(startdate, enddate)
 def get_data():
-#    url = make_seattle_data_url(startdate, enddate)
+    startdate = get_start_of_previous_week (datetime.now())
+    enddate = datetime.now()
+
+    strstartdate = datetime.strftime(startdate, "%m/%d%y %H:%M:%S %p %z")
+    strenddate = datetime.strftime(enddate, "%m/%d%y %H:%M:%S %p %z")
+
+    DATA_URL = make_seattle_data_url(strstartdate, strenddate)
     if not exists(DATA_FILENAME):
         resp = requests.get(DATA_URL)
         txt = resp.text
@@ -61,10 +53,6 @@ def get_calls_for_week_of(somedate):
 
     return weekcalls
 
-
-
-
-
 def current_week_calls():
     return  get_calls_for_week_of(datetime.now())
 
@@ -72,32 +60,3 @@ def current_week_calls():
 def last_week_calls():
     d = get_start_of_previous_week(datetime.now())
     return get_calls_for_week_of(d)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
